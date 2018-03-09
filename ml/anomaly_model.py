@@ -1,4 +1,4 @@
-import sklearn.ensemble.IsolationForest
+from sklearn.ensemble import IsolationForest
 from sklearn.externals import joblib
 import numpy as np
 DEBUG = True
