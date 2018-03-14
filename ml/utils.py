@@ -13,6 +13,12 @@ def read_tcpdump_file(tcpdump_file):
     for ts, buf in pcap:
       yield ts, buf
 
+def featurize_scapy_pkts(pkts):
+  features = []
+  for pkt in pkts:
+    features.append(featurize_scapy_pkt(pkt))
+  return features
+
 def featurize_scapy_pkt(pkt):
   """
   Converts a scapy packet into a list of features.
@@ -26,7 +32,15 @@ def featurize_scapy_pkt(pkt):
       pkt[TCP].ack, pkt[TCP].flags, pkt[TCP].window, pkt[TCP].chksum])
   return features
 
-def featurize_packets(packets):
+def dpkt_to_scapy(pkts):
+  new_pkts = []
+  for ts, buf in pkts:
+    eth = dpkt.ethernet.Ethernet(buf)
+    pkt = Ether(buf)
+    new_pkts.append(pkt)
+  return new_pkts
+
+def featurize_dpkt_packets(packets):
   """
   """
   for ts, buf in packets:

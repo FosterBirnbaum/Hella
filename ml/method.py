@@ -3,6 +3,7 @@ from scapy.all import *
 from headers import Seer
 from anomaly_model import AnomalyModel
 from utils import *
+import cPickle as pickle
 
 ETH_BROADCAST = 'ff:ff:ff:ff:ff:ff'
 
@@ -16,13 +17,23 @@ class Method():
         self.send_fn = send_fn
 
     def load_model(self):
+        
         try:
             self.model.load('model.pkl')
         except:
-            reader = read_tcpdump_file('data/outside.tcpdump')
-            packets = [f for f in featurize_packets(reader)]
+            try:
+                packets = pickle.load(open('packets.pkl', 'rb'))
+                print("Loaded packets")
+                print(packets[:5])
+            except:
+                print("Starting reading")
+                reader = read_tcpdump_file('data/outside.tcpdump')
+                print("Done reading")
+                packets = featurize_scapy_pkts(dpkt_to_scapy(reader))
+                print("Done featurizing")
+                pickle.dump(packets, open('packets.pkl', 'wb'))
             self.model.fit(packets)
-            model.save('model.pkl')
+            self.model.save('model.pkl')
 
     def handle_pkt(self, pkt):
         featurized_pkt = featurize_scapy_pkt(pkt)
