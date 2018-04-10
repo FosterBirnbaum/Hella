@@ -36,17 +36,17 @@ if __name__ == "__main__":
 
   # Get JSON of updates available.
   update_info = get_update_info()
-  print(get_update_info())
+  # print(get_update_info())
 
-  # Get the latest update tarball and write
-  # it to the file latest.update. 
-  update = get_latest_update()
-  with open("latest.update", "wb") as handle:
-      handle.write(update)
+  # # Get the latest update tarball and write
+  # # it to the file latest.update.
+  # update = get_latest_update()
+  # with open("latest.update", "wb") as handle:
+  #     handle.write(update)
 
-  # Get specific update tarball and write it
-  # to the file specific.update. 
-  update_id = "7d93e61d-2dd2-4829-ac94-4a6c5edc52d3"
-  update = get_update(update_id)
-  with open("specific.update", "wb") as handle:
-      handle.write(update)
+  # # Get specific update tarball and write it
+  # # to the file specific.update.
+  # update_id = "7d93e61d-2dd2-4829-ac94-4a6c5edc52d3"
+  # update = get_update(update_id)
+  # with open("specific.update", "wb") as handle:
+  #     handle.write(update)
