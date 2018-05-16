@@ -1,39 +1,46 @@
 from time import sleep
 
+from scapy.all import *
 import sys, os
 sys.path.append(os.path.expandvars('../ml'))
 sys.path.append(os.path.expandvars('../monitor'))
-from monitor import Monitor
+from monitor import Monitor, ATTACK_TYPES
 from method import Method
 import dataset_generator
 import api
 import argparse
+
+TIMEOUT = 5
 
 DATASET_EXT = '.pcap'
 
 class Simulator():
     # note that in order to use the api, you must run with sudo
     # in order to send and receive real packets with scapy
-    def __init__(self, verbosity, use_api, dataset_filename):
+    def __init__(self, verbosity, use_api, dataset_filename, attack_type):
         self.api = api.API() if use_api else None
         self.dataset_filename = dataset_filename
-        self.monitor = Monitor(None, send_fn=self.send_to_method, log_level=int(args.verbosity))
+        self.monitor = Monitor(None, send_fn=self.send_to_method,
+            log_level=int(args.verbosity), attack_type=attack_type)
         self.method = Method(self.api, send_fn=self.send_to_monitor)
 
     def generate_test_data(self):
         return dataset_generator.generate_test_data('darpa')
 
     def send_to_method(self, pkt):
-        self.method.handle_pkt(pkt)
+        pkt = str(pkt).encode('utf-8')
+        self.method.handle_pkt(Ether(pkt))
 
     def send_to_monitor(self, pkt):
-        self.monitor.handle_pkt(pkt)
+        pkt = str(pkt).encode('utf-8')
+        self.monitor.handle_pkt(Ether(pkt))
 
     def run(self):
         self.create_test_data()
 
         self.monitor.send()
-        while not self.monitor.completed():
+        for i in range(TIMEOUT):
+            if self.monitor.completed(): break
             sleep(.1)
         self.monitor.show_results()
 
@@ -44,7 +51,7 @@ class Simulator():
         if self.api:
             self.method.make_requests()
             pkts = self.api.drain_pkts()
-            self.monitor.create_test_data(pkts, should_fuzz=True)
+            self.monitor.create_test_data(pkts)
         else:
             test_data = self.generate_test_data()
             self.monitor.set_test_data(test_data)
@@ -63,9 +70,11 @@ if __name__ == '__main__':
     parser.add_argument('--api', action='store_true', default=False)
     parser.add_argument('--dataset',
         help='specify a filename for the generated pcap file', type=str)
+    parser.add_argument('--attack',
+        help='type of attack {}'.format(ATTACK_TYPES), type=str)
     args = parser.parse_args()
     if args.verbosity is None:
         args.verbosity = 0
 
-    simulator = Simulator(args.verbosity, args.api, args.dataset)
+    simulator = Simulator(args.verbosity, args.api, args.dataset, args.attack)
     simulator.run()

@@ -72,7 +72,7 @@ class API():
     # TODO: do we want to capture egress traffic as well?
     def capture_pkts(self):
         # sniff until we see a fin flag
-        pkts = sniff(filter='src host {}'.format(self.api_ip), count=0,
+        pkts = sniff(filter='src host {} or arp'.format(self.api_ip), count=0,
             stop_filter=lambda p: p[TCP].flags & TCP_FIN == TCP_FIN)
         self.recv_pkts.extend(pkts)
 

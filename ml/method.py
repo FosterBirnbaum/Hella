@@ -26,13 +26,13 @@ class Method():
 
             packets = []
 
-            packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('data/week1_monday.tcpdump')])
+            packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('/Users/sarahtollman/Hella/ml/data/week1_monday.tcpdump')])
 
-            packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('data/week1_tuesday.tcpdump')])
+            packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('/Users/sarahtollman/Hella/ml/data/week1_tuesday.tcpdump')])
 
-            packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('data/week1_wednesday.tcpdump')])
+            # packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('/Users/sarahtollman/Hella/ml/data/week1_wednesday.tcpdump')])
 
-            packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('data/week1_friday.tcpdump')])
+            # packets.extend([fr.featurize(pkt) for pkt in read_scapy_pkts('/Users/sarahtollman/Hella/ml/data/week1_friday.tcpdump')])
 
             print("Fitting on %d packets" % len(packets))
 
@@ -49,6 +49,7 @@ class Method():
         featurize_fn = featurize_scapy_pkt if 'scapy' in str(type(pkt)) \
             else featurize_dpkt_pkt
         featurized_pkt = featurize_fn(pkt)
+        # TODO: print len, expected is 14 or 15.
         prediction = self.model.predict(featurized_pkt)
         ether = Ether(dst=ETH_BROADCAST, src=ETH_SRC)
         seer = Seer(malicious=prediction, data=pkt)
