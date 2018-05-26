@@ -31,8 +31,8 @@ for i in {0..0}
 do
   echo "Downloading ${to_download_assets[$i]}.zip for training"
   python ../zoo/gdrive.py ${!to_download_assets[$i]} assets.zip
-  unzip assets.zip
-  rm assets.zip
+  mkdir assets
+  unzip assets.zip -d assets/
 done
 
 exit 0
